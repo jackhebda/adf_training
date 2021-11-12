@@ -1,0 +1,17 @@
+{
+	"name": "AzureDatabricks1",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-1197568336028929.9.azuredatabricks.net",
+			"existingClusterId": "1021-083345-ll8gduq6",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI4ZjJiNTE3OC01NzJjLTQzNTYtODI4My0yY2ZkNzIyYzhiODAiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "ardennes-integrated",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

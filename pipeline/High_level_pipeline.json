@@ -1,0 +1,43 @@
+{
+	"name": "High_level_pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Extract",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Extract_pipeline",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Transform and Load",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Transform_pipeline",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2021-11-09T10:23:35Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

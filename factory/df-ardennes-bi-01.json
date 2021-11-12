@@ -1,0 +1,9 @@
+{
+	"name": "df-ardennes-bi-01",
+	"location": "westeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d419f5f6-0c6d-4eae-b6ac-9935d27e7e23",
+		"tenantId": "e113a6d4-871a-4cd6-b872-d9dda3d431dc"
+	}
+}

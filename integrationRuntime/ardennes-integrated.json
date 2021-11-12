@@ -1,0 +1,6 @@
+{
+	"name": "ardennes-integrated",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}

@@ -1,0 +1,3031 @@
+{
+	"name": "Extract_pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy_ae_reservation",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}/ae_reservation.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDReservation, IDLocation, IDClient, debutsejour, endsejour, typesejour, LastDate, NbrAdultes, NbrEnfants, NbrBebe, NbrAdo, NbrAnimaux, Base, RemiseType, Remise, PVN, NbrJour, Charges, Charges_SP, Netoyage, Caution, AssuranceProprietaire, Total, Status, PrixAchat, PAR, DateStatus8, DateAnnulation, Global_Frais_de_dossier, RappelLastMin, RappelAccompte, RappelSolde, HoraireArrivée, HoraireDepart, Caution_Jour_restit, Caution_Remboursee, Caution_Bloquee, Caution_Raison_Blocage, Caution_a_Rembourser, Caution_Retenue_Degat, Caution_Retenue_Decompte, DateReponseEnquete, DateRappelEnquete, DateEnquete, GuideEnvoye, Montantrembannulcli, Indemannulproprio, AgeMin, AgeMax, ObjetSejour, Date_SmsBienvenue, Date_MailNlap,  PasDEnqueteSatisfaction, Date_SmsGAP, BlocageAnimaux, BlocageGroupe, ResaPlus1AnVerif, DateSynchroErp, StatutErp, ERP_CautionRemb, ERP_CautionRembProprio, ERP_CautionRembClient, IDApiUser, Resa8min, ConfResaClient, TestName, TestVersion\nFROM `Ardennes-Etape2`.AE_Reservation;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_ae_reservation",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_ae_reservation",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_ae_reservation_charges",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/ae_reservation_charges.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDReservation_Charges, valeur, Payable_a, Remb_a, Obligatoire, Rem, Jour_restit, IDReservation, Beneficiaire, Inclus_prix_base, Jour_restit_proprio, MultPar, SuivantIndex, ParJour, IDCharge_Supp, ChargeEstimee, ChargeCalculee, PrixEstime, PrixUnitaire, NbrMultPar\nFROM `Ardennes-Etape2`.AE_Reservation_Charges;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "IDReservation_Charges",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDReservation_Charges",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "valeur",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "valeur",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Payable_a",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Payable_a",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Remb_a",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Remb_a",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Obligatoire",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Obligatoire",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Rem",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Rem",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Jour_restit",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "Jour_restit",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "IDReservation",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDReservation",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "Beneficiaire",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Beneficiaire",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Inclus_prix_base",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Inclus_prix_base",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Jour_restit_proprio",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "Jour_restit_proprio",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "MultPar",
+									"type": "String"
+								},
+								"sink": {
+									"name": "MultPar",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "SuivantIndex",
+									"type": "Int16"
+								},
+								"sink": {
+									"name": "SuivantIndex",
+									"type": "Int16"
+								}
+							},
+							{
+								"source": {
+									"name": "ParJour",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ParJour",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "IDCharge_Supp",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDCharge_Supp",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "ChargeEstimee",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ChargeEstimee",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ChargeCalculee",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ChargeCalculee",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PrixEstime",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PrixEstime",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "PrixUnitaire",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "PrixUnitaire",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "NbrMultPar",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "NbrMultPar",
+									"type": "Int32"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_ae_reservation_charges",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_ae_reservation_charges",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_ae_reservation_facture",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/ae_reservation_facture.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDReservation_Facture, IdReservation, IdDocument, DateSurFacture, NumDecompte, FactureStatus, NombreEnvoi, Creatdt, Moddt, PayementRecu, PayementDesCharges\nFROM `Ardennes-Etape2`.AE_Reservation_Facture;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "IDReservation_Facture",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDReservation_Facture",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "IdReservation",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IdReservation",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "IdDocument",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IdDocument",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "DateSurFacture",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "DateSurFacture",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "NumDecompte",
+									"type": "String"
+								},
+								"sink": {
+									"name": "NumDecompte",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "FactureStatus",
+									"type": "String"
+								},
+								"sink": {
+									"name": "FactureStatus",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "NombreEnvoi",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "NombreEnvoi",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "Creatdt",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "Creatdt",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "Moddt",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "Moddt",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "PayementRecu",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "PayementRecu",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "PayementDesCharges",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PayementDesCharges",
+									"type": "String"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_ae_reservation_facture",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_ae_reservation_facture",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_ae_reservation_facture_charges",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/ae_reservation_facture_charges.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDAE_Reservation_Facture_Charges, IDLocation, IDCharge_Supp, valeur, Rem, Jour_restit, IDReservation, MultPar, SuivantIndex, ParJour, Qte, Total, Multiplicateur, IDReservation_Facture, IndexPlus, IndexMoins, TVA\nFROM `Ardennes-Etape2`.AE_Reservation_Facture_Charges;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "IDAE_Reservation_Facture_Charges",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDAE_Reservation_Facture_Charges",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "IDLocation",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDLocation",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "IDCharge_Supp",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDCharge_Supp",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "valeur",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "valeur",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Rem",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Rem",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Jour_restit",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "Jour_restit",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "IDReservation",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDReservation",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "MultPar",
+									"type": "String"
+								},
+								"sink": {
+									"name": "MultPar",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "SuivantIndex",
+									"type": "Int16"
+								},
+								"sink": {
+									"name": "SuivantIndex",
+									"type": "Int16"
+								}
+							},
+							{
+								"source": {
+									"name": "ParJour",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ParJour",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Qte",
+									"type": "Single"
+								},
+								"sink": {
+									"name": "Qte",
+									"type": "Single"
+								}
+							},
+							{
+								"source": {
+									"name": "Total",
+									"type": "Single"
+								},
+								"sink": {
+									"name": "Total",
+									"type": "Single"
+								}
+							},
+							{
+								"source": {
+									"name": "Multiplicateur",
+									"type": "Single"
+								},
+								"sink": {
+									"name": "Multiplicateur",
+									"type": "Single"
+								}
+							},
+							{
+								"source": {
+									"name": "IDReservation_Facture",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDReservation_Facture",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "IndexPlus",
+									"type": "Single"
+								},
+								"sink": {
+									"name": "IndexPlus",
+									"type": "Single"
+								}
+							},
+							{
+								"source": {
+									"name": "IndexMoins",
+									"type": "Single"
+								},
+								"sink": {
+									"name": "IndexMoins",
+									"type": "Single"
+								}
+							},
+							{
+								"source": {
+									"name": "TVA",
+									"type": "Single"
+								},
+								"sink": {
+									"name": "TVA",
+									"type": "Single"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_ae_reservation_facture_charges",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_ae_reservation_facture_charges",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_ae_reservation_plainte",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/ae_reservation_plainte.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDReservation, Status, SousStatus, AE_Se_Retire_Mediation, IDGestionnaire, TypePlainte, Montant_Bon_A_Valoir_AE,  DateCreation, Montant_Geste_Com_AE_Client, Montant_Intervention_Proprietaire, DateFermeture, Montant_Geste_Com_AE_Proprio, Montant_Intervention_Locataire, IDPlainte, Charges, Degats, Proprete_MDV_Arrivee, Proprete_MDV_Depart, Wellness, Entretien, Exterieur, Confort_MDV, Descriptif_MDV, Erreur_AE, Comportement_Proprio_Gerant, Nature_Autre, Comportement_Loc, Memo, DegatLocAEEU, DegatLocAEIF, AbsenceGAP, ViaEnquete, LeconProprio, Wifi, Code_Rouge, LaveVaisselle, Eau, Electricite, Chauffage, WC, Nature_Autre_Pro, Loisir, Salon, Montant_Initial_Proprio\nFROM `Ardennes-Etape2`.AE_Reservation_Plainte;"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "IDReservation",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDReservation",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "Status",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "SousStatus",
+									"type": "String"
+								},
+								"sink": {
+									"name": "SousStatus",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AE_Se_Retire_Mediation",
+									"type": "String"
+								},
+								"sink": {
+									"name": "AE_Se_Retire_Mediation",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "IDGestionnaire",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDGestionnaire",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "TypePlainte",
+									"type": "String"
+								},
+								"sink": {
+									"name": "TypePlainte",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Montant_Bon_A_Valoir_AE",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Montant_Bon_A_Valoir_AE",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "DateCreation",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "DateCreation",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "Montant_Geste_Com_AE_Client",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Montant_Geste_Com_AE_Client",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Montant_Intervention_Proprietaire",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Montant_Intervention_Proprietaire",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "DateFermeture",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "DateFermeture",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "Montant_Geste_Com_AE_Proprio",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Montant_Geste_Com_AE_Proprio",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Montant_Intervention_Locataire",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Montant_Intervention_Locataire",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "IDPlainte",
+									"type": "Int64"
+								},
+								"sink": {
+									"name": "IDPlainte",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "Charges",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Charges",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Degats",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Degats",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Proprete_MDV_Arrivee",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Proprete_MDV_Arrivee",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Proprete_MDV_Depart",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Proprete_MDV_Depart",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Wellness",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Wellness",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Entretien",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Entretien",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Exterieur",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Exterieur",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Confort_MDV",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Confort_MDV",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Descriptif_MDV",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Descriptif_MDV",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Erreur_AE",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Erreur_AE",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Comportement_Proprio_Gerant",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Comportement_Proprio_Gerant",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Nature_Autre",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Nature_Autre",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Comportement_Loc",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Comportement_Loc",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Memo",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Memo",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DegatLocAEEU",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "DegatLocAEEU",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "DegatLocAEIF",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "DegatLocAEIF",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "AbsenceGAP",
+									"type": "String"
+								},
+								"sink": {
+									"name": "AbsenceGAP",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ViaEnquete",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ViaEnquete",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "LeconProprio",
+									"type": "String"
+								},
+								"sink": {
+									"name": "LeconProprio",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Wifi",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Wifi",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Code_Rouge",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Code_Rouge",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "LaveVaisselle",
+									"type": "String"
+								},
+								"sink": {
+									"name": "LaveVaisselle",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Eau",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Eau",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Electricite",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Electricite",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Chauffage",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Chauffage",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "WC",
+									"type": "String"
+								},
+								"sink": {
+									"name": "WC",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Nature_Autre_Pro",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Nature_Autre_Pro",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Loisir",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Loisir",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Salon",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Salon",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Montant_Initial_Proprio",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Montant_Initial_Proprio",
+									"type": "Double"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_ae_reservation_plainte",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_ae_reservation_plainte",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_ae_reservation_status",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/ae_reservation_status.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDReservation_Status, IDReservation, StatusDepart, StatusFin, DateChangement, IDGestionnaire\nFROM `Ardennes-Etape2`.AE_Reservation_Status;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_ae_reservation_status",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_ae_reservation_status",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_aepreo_reservation",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/aepreo_reservation.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDLocation, IDClient, debutsejour, endsejour, typesejour, LastDate, NbrAdultes, NbrEnfants, NbrBebe, NbrAdo, NbrAnimaux, Base, RemiseType, Remise, PVN, NbrJour, Charges, Charges_SP, Netoyage, Caution, AssuranceProprietaire, Total, Status, PrixAchat, PAR, DateStatus8, DateAnnulation, Global_Frais_de_dossier, RappelLastMin, RappelAccompte, RappelSolde, HoraireArrivée, HoraireDepart, Caution_Jour_restit, Caution_Remboursee, Caution_Bloquee, Caution_Raison_Blocage, Caution_a_Rembourser, Caution_Retenue_Degat, Caution_Retenue_Decompte, DateReponseEnquete, DateRappelEnquete, DateEnquete, GuideEnvoye, Montantrembannulcli, Indemannulproprio, AgeMin, AgeMax, ObjetSejour, Date_SmsBienvenue, Date_MailNlap,  PasDEnqueteSatisfaction, Date_SmsGAP, BlocageAnimaux, BlocageGroupe, ResaPlus1AnVerif, IDApiUser, TestName, TestVersion\nFROM `Ardennes-Etape2`.AEPRO_Reservation;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "IDLocation",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDLocation",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "IDClient",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDClient",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "debutsejour",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "debutsejour",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "endsejour",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "endsejour",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "typesejour",
+									"type": "String"
+								},
+								"sink": {
+									"name": "typesejour",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "LastDate",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "LastDate",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "NbrAdultes",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "NbrAdultes",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "NbrEnfants",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "NbrEnfants",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "NbrBebe",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "NbrBebe",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "NbrAdo",
+									"type": "Int64"
+								},
+								"sink": {
+									"name": "NbrAdo",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "NbrAnimaux",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "NbrAnimaux",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "Base",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Base",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "RemiseType",
+									"type": "String"
+								},
+								"sink": {
+									"name": "RemiseType",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Remise",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Remise",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "PVN",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "PVN",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "NbrJour",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "NbrJour",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Charges",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Charges",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Charges_SP",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Charges_SP",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Netoyage",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Netoyage",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Caution",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Caution",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "AssuranceProprietaire",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "AssuranceProprietaire",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Total",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Total",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Status",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "PrixAchat",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "PrixAchat",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "PAR",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "PAR",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "DateStatus8",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "DateStatus8",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "DateAnnulation",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "DateAnnulation",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "Global_Frais_de_dossier",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Global_Frais_de_dossier",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "RappelLastMin",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "RappelLastMin",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "RappelAccompte",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "RappelAccompte",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "RappelSolde",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "RappelSolde",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "HoraireArrivée",
+									"type": "String"
+								},
+								"sink": {
+									"name": "HoraireArrivée",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "HoraireDepart",
+									"type": "String"
+								},
+								"sink": {
+									"name": "HoraireDepart",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Caution_Jour_restit",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Caution_Jour_restit",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Caution_Remboursee",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "Caution_Remboursee",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "Caution_Bloquee",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "Caution_Bloquee",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "Caution_Raison_Blocage",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Caution_Raison_Blocage",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Caution_a_Rembourser",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Caution_a_Rembourser",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Caution_Retenue_Degat",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Caution_Retenue_Degat",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Caution_Retenue_Decompte",
+									"type": "Single"
+								},
+								"sink": {
+									"name": "Caution_Retenue_Decompte",
+									"type": "Single"
+								}
+							},
+							{
+								"source": {
+									"name": "DateReponseEnquete",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "DateReponseEnquete",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "DateRappelEnquete",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "DateRappelEnquete",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "DateEnquete",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "DateEnquete",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "GuideEnvoye",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "GuideEnvoye",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "Montantrembannulcli",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Montantrembannulcli",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "Indemannulproprio",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "Indemannulproprio",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "AgeMin",
+									"type": "String"
+								},
+								"sink": {
+									"name": "AgeMin",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AgeMax",
+									"type": "String"
+								},
+								"sink": {
+									"name": "AgeMax",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ObjetSejour",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ObjetSejour",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Date_SmsBienvenue",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "Date_SmsBienvenue",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "Date_MailNlap",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "Date_MailNlap",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "PasDEnqueteSatisfaction",
+									"type": "String"
+								},
+								"sink": {
+									"name": "PasDEnqueteSatisfaction",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Date_SmsGAP",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "Date_SmsGAP",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "BlocageAnimaux",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "BlocageAnimaux",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "BlocageGroupe",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "BlocageGroupe",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "ResaPlus1AnVerif",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ResaPlus1AnVerif",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "IDApiUser",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "IDApiUser",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "TestName",
+									"type": "String"
+								},
+								"sink": {
+									"name": "TestName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "TestVersion",
+									"type": "String"
+								},
+								"sink": {
+									"name": "TestVersion",
+									"type": "String"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_aepreo_reservation",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_aepreo_reservation",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_aepreo_reservation_status",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/aepreo_reservation_status.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDReservation_Status, IDReservation, StatusDepart, StatusFin, DateChangement, IDGestionnaire\nFROM `Ardennes-Etape2`.AEPRO_Reservation_Status;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_aepreo_reservation_status",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_aepreo_reservation_status",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_cachelocation",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/cachelocation.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDLocation, NbrEnquete, Filtre_TypeBien_Villa, Filtre_TypeBien_Chateau, Filtre_TypeBien_Insolite, Filtre_TypeBien_Cottage, Filtre_TypeBien_Maison, Filtre_TypeBien_Chalet, Filtre_TypeBien_GiteALaFerme, Filtre_TypeBien_Seminaire, Filtre_Promotion_Promo, Filtre_Nouveau_Nouveau, Filtre_Detente_Piscine, Filtre_Detente_PiscineInterieure, Filtre_Detente_PiscineExterieure, Filtre_Detente_Sauna, Filtre_Detente_Hammam, Filtre_Detente_Jacuzzi, Filtre_recommandation_Couple, Filtre_recommandation_FamilleEnfant, Filtre_recommandation_FamilleAdo, Filtre_recommandation_GroupeAmis, Filtre_recommandation_Animaux, Filtre_recommandation_QualitePrix, Filtre_recommandation_Pmr, Filtre_Enfants_JeuxExterieur, Filtre_Enfants_ChaiseEnfant, Filtre_Enfants_LitBebe, Filtre_Enfants_Parc, Filtre_Enfants_CoussinALanger, Filtre_Enfants_MicroOnde, Filtre_Equipement_JeuxInterieurs, Filtre_Equipement_Internet, Filtre_Equipement_FeuOuvert, Filtre_Equipement_MachineALaver, Filtre_Equipement_Salle_de_reunion, NbrLit1p, NbrLit2p, NbrLit\nFROM `Ardennes-Etape2`.cacheLocation;"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_cachelocation",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_cachelocation",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_calendar",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/calendar.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT EventDate, EventType, IDLocation, EventPrice1, EventPrice2, EventPrice3, EventPrice4, EventPrice5, SetNom, Saison_idx\nFROM `Ardennes-Etape2`.Calendar;"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_calendar",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_calendar",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_capacombi",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/capacombi.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDCapaCombi, Base, SousMaison\nFROM `Ardennes-Etape2`.CapaCombi;"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_capacombi",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_capacombi",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_charge_supp",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/charge_supp.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDCharge_Supp, IDLocation, Description, TypeSejour, Obligatoire, Parjour, Payable_a, MultPar, Beneficiaire, SuivantIndex, Inclus_prix_base, Variable_saison, Affichage_inclus_prix_base, Type_de_charge, Rembousable_a, Valeur_ete, Valeur_hiver, Minimum_ete, Minimum_hiver, Debut_ete, Fin_ete, Nbr_jours_restit, Nbr_jours_restit_proprio, Unite, NOrder,  ChargeSuivantConsommation, MultParDefault, CategorieCharge\nFROM `Ardennes-Etape2`.Charge_Supp;"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_charge_supp",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_charge_supp",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_charges",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/charges.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDLocation, Adresse, Numero, Localite, Code_postal, Pays, IdProvince, IdCommune, IdCodePostal, IdPays\nFROM `Ardennes-Etape2`.Charges;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_charges",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_charges",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_client",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/client.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDClient, Nom, Prenom, CAST(Birthday as CHAR) as Birthday, EMail, Langue, LangueDocument, LangueNewsletter, Telephone, GSM,  Compte_Banque_Bic, Compte_Banque_Iban, DateCreation, MiseAJour, ListeRouge, Not_Agree_Partner, Flag_Attente, acceptnews, GeoPosX, GeoPosY, FlagGeoPos, DateChangementMdp, NumCustomerErp, FBID, GOOGLEID, GUIDClientCRM, RappelCoordBanc, MailConfirmation\nFROM `Ardennes-Etape2`.Client;"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"enableSkipIncompatibleRow": false,
+					"validateDataConsistency": true,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "IDClient",
+									"type": "Int64"
+								},
+								"sink": {
+									"name": "IDClient",
+									"type": "Int64"
+								}
+							},
+							{
+								"source": {
+									"name": "Nom",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Nom",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Prenom",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Prenom",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Birthday",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Birthday",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "EMail",
+									"type": "String"
+								},
+								"sink": {
+									"name": "EMail",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Langue",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Langue",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "LangueDocument",
+									"type": "String"
+								},
+								"sink": {
+									"name": "LangueDocument",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "LangueNewsletter",
+									"type": "String"
+								},
+								"sink": {
+									"name": "LangueNewsletter",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Telephone",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Telephone",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "GSM",
+									"type": "String"
+								},
+								"sink": {
+									"name": "GSM",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Compte_Banque_Bic",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Compte_Banque_Bic",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Compte_Banque_Iban",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Compte_Banque_Iban",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DateCreation",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "DateCreation",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "MiseAJour",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "MiseAJour",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "ListeRouge",
+									"type": "String"
+								},
+								"sink": {
+									"name": "ListeRouge",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Not_Agree_Partner",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Not_Agree_Partner",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Flag_Attente",
+									"type": "Byte"
+								},
+								"sink": {
+									"name": "Flag_Attente",
+									"type": "Byte"
+								}
+							},
+							{
+								"source": {
+									"name": "acceptnews",
+									"type": "String"
+								},
+								"sink": {
+									"name": "acceptnews",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "GeoPosX",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "GeoPosX",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "GeoPosY",
+									"type": "Double"
+								},
+								"sink": {
+									"name": "GeoPosY",
+									"type": "Double"
+								}
+							},
+							{
+								"source": {
+									"name": "FlagGeoPos",
+									"type": "Int16"
+								},
+								"sink": {
+									"name": "FlagGeoPos",
+									"type": "Int16"
+								}
+							},
+							{
+								"source": {
+									"name": "DateChangementMdp",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "DateChangementMdp",
+									"type": "DateTime"
+								}
+							},
+							{
+								"source": {
+									"name": "NumCustomerErp",
+									"type": "String"
+								},
+								"sink": {
+									"name": "NumCustomerErp",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "FBID",
+									"type": "String"
+								},
+								"sink": {
+									"name": "FBID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "GOOGLEID",
+									"type": "String"
+								},
+								"sink": {
+									"name": "GOOGLEID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "GUIDClientCRM",
+									"type": "String"
+								},
+								"sink": {
+									"name": "GUIDClientCRM",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RappelCoordBanc",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "RappelCoordBanc",
+									"type": "Int32"
+								}
+							},
+							{
+								"source": {
+									"name": "MailConfirmation",
+									"type": "Int32"
+								},
+								"sink": {
+									"name": "MailConfirmation",
+									"type": "Int32"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_client",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_client",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_concurrentpropriolocation",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/concurrentpropriolocation.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDProprietaire, IDLocation, Url, BelVilla, EuroRelais, BelSud, ApratRent, VillaXl, ArdennesRefuges, Leisure, Novasol, HappyHome, DurbuyAdenture, Outvak_nl, VillaPolis, ArdenneResidences, Agencebellefrance, Booking, Immoweb, AirBnb, Autres, Concurrent, AirBnb_url, Casapilot, LastSave\nFROM `Ardennes-Etape2`.ConcurrentProprioLocation;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_concurrentpropriolocation",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_concurrentpropriolocation",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_diverslocation",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/diverslocation.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDLocation, Region_Commerciale, Nbr_Chambres, Nbr_SDB, Superficie, Animaux_Admis,  DateValidite_incendie\nFROM `Ardennes-Etape2`.DiversLocation;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_diverslocation",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_diverslocation",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_gestionnaire",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}/gestionnaire.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDGestionnaire, Compte_Actif, Nom, Prenom, Login, LoginWindows, EMail, Initiales, Couleur, `EMail_ardennes-etape.com`, `EMail_france-sejour.com`, `EMail_espagne-sejour.com`, `EMail_business-etape.com`, CallCenter, ContactExterne, IDUser_Mantis, PonderationMail, DateEntree, freshDeskAgentId\nFROM `Ardennes-Etape2`.Gestionnaire;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_gestionnaire",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_gestionnaire",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_location",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/location.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDLocation, TypeLogement, Capacite, CapaTxt, Region, Confort, Confort_Prec, Nom, Reference_AE, GeoPosX, GeoPosY, Priorite, Marge, MargeSupplementaire, Proprietaire, Gerant, Gerant_Admin, NbrAdulte, NbrAdo, NbrEnfant, NbrBebe, NbrAnimaux, Franchise, SetSaison, TypeActionLocation, Stat_Maison_Cote, IDLocation_Theme, IDLocationTransfere, IDGestionnaireSuivi, IDGestionnaire, DateCreation, DateMiseEnLignePrevue, VentilationLoyer, ContratSpecial, CapaRed, CapaRedParentLocation\nFROM `Ardennes-Etape2`.Location;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_location",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_location",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_location_action",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/location_action.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDLocationAction, IDLocation, TypeAction, DateInsertionSysteme, DateExecution, DateExecutionReelle, FlagExecution, Remarque, FlagRewrited\nFROM `Ardennes-Etape2`.Location_Action;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_location_action",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_location_action",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_proprietaire",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/proprietaire.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDProprietaire, Login, Societe, Nom, Prenom, Tel, Tel2, GSM, GSM_Prive, Fax, Localite, Pays, LangueParlee, LangueDocument, EMail, TVA, Proprietaire, Societe_Tierce, IBAN, BIC, LangueParlee1, LangueParlee2, LangueParlee3, LangueParlee4, Grand_Compte, Affichage_Email_Client, DateChangementMdp, NumCustomerErp, NumVendorErp, AppTester\nFROM `Ardennes-Etape2`.Proprietaire;"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_proprietaire",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_proprietaire",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_rm_location",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/rm_location.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT id, IDLocation, subscriptionDatetime, IDProprioSubscriber\nFROM `Ardennes-Etape2`.RM_location;\n"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_rm_location",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_rm_location",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_saisons",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/saisons.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT SaisonDate, Saison, IDSaisons_Set\nFROM `Ardennes-Etape2`.Saisons;"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_saisons",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_saisons",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_saisons_nom",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/saisons_nom.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDSaisons_Nom, IDSaisons_Set, NumSaison, Saisons_Nom_Contrat\nFROM `Ardennes-Etape2`.Saisons_Nom;"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_saisons_nom",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_saisons_nom",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy_saisons_set",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "Destination",
+						"value": "raw/@{concat(formatDateTime(trigger().startTime,'yyyy'), '/', formatDateTime(trigger().startTime,'MM'), '/', formatDateTime(trigger().startTime,'dd'))}/saisons_set.parquet"
+					}
+				],
+				"typeProperties": {
+					"source": {
+						"type": "MySqlSource",
+						"query": "SELECT IDSaisons_Set, SaisonsNom, Online\nFROM `Ardennes-Etape2`.Saisons_Set;"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"validateDataConsistency": true
+				},
+				"inputs": [
+					{
+						"referenceName": "SourceDataset_saisons_set",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DestinationDataset_saisons_set",
+						"type": "DatasetReference",
+						"parameters": {
+							"cw_folderPath": "@{formatDateTime(trigger().startTime,'yyyy')}/@{formatDateTime(trigger().startTime,'MM')}/@{formatDateTime(trigger().startTime,'dd')}"
+						}
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2021-11-10T08:54:01Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

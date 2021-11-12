@@ -1,0 +1,138 @@
+{
+	"name": "Transform_pipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "DQ_correct_input",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Self_Service",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/brieuc.boonen@ardennes-etape.com/Main Run/run_dq_correct_input"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "DQ_valid_if_to_standards",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "DQ_correct_input",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/brieuc.boonen@ardennes-etape.com/Main Run/run_dq_valid_if_to_standards"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "DQ_valid_to_standards",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "DQ_valid_if_to_standards",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/brieuc.boonen@ardennes-etape.com/Main Run/run_dq_valid_to_standards"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Self_Service",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Raw_to_standardized",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/brieuc.boonen@ardennes-etape.com/Main Run/run_self_service_maison"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Raw_to_standardized",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/brieuc.boonen@ardennes-etape.com/Main Run/run_raw_to_standardized"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2021-11-05T16:39:59Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
